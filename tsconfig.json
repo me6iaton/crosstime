@@ -9,7 +9,7 @@
     "diagnostics": true
   },
   "include": [
-    "src",
+    "src/server/",
     "test",
   ],
   "exclude": [

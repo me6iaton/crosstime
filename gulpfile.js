@@ -29,7 +29,7 @@ const gsc = gulpShellCmd;
 // const ts = require('gulp-typescript');
 // const tsProject = ts.createProject('tsconfig.json');
 // const globs = {
-//   ts: ['src/**/*.ts', 'test**/*.ts', 'index.ts'],
+//   ts: ['src/server/**/*.ts', 'test**/*.ts', 'index.ts'],
 // };
 // gulp.task('build:ts', () => {
 //   return gulp.src(globs.ts, { base: './' })
