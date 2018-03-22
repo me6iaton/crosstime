@@ -1,12 +1,12 @@
+import {inject} from '@loopback/core';
 import {
   UserProfile,
   authenticate,
   AuthenticationBindings,
 } from '@loopback/authentication';
-import {inject} from '@loopback/core';
 import {get} from '@loopback/openapi-v3';
 
-export class MyController {
+export class WhoAmIController {
   constructor(
     @inject(AuthenticationBindings.CURRENT_USER) private user: UserProfile,
   ) {}

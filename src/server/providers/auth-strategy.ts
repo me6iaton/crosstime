@@ -2,8 +2,8 @@ import {inject, Provider, ValueOrPromise} from '@loopback/context';
 import {
   AuthenticationBindings,
   AuthenticationMetadata,
+  UserProfile,
 } from '@loopback/authentication';
-
 import {Strategy} from 'passport';
 import {BasicStrategy} from 'passport-http';
 
@@ -27,21 +27,21 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
     }
   }
 
-  verify(username: string, password: string, cb: Function) {
+  verify(
+    username: string,
+    password: string,
+    cb: (err: Error | null, user?: UserProfile | false) => void,
+  ) {
     console.log('verify test');
-
     // find user by name & password
     // call cb(null, false) when user not found
-    // call cb(null, userProfile) when user is authenticated
+    // call cb(null, user) when user is authenticated
     if (username && password) {
       console.log(`
       /Users/me6iaton/Projects/js/loopback/crosstime/src/providers/auth-strategy.ts:
        verify username: ${username} password:${password}
       `);
-      cb(null, {
-        id: '1',
-        name: username,
-      });
+      cb(null, {id: '1', name: username});
     } else {
       cb(null, false);
     }

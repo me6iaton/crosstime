@@ -1,17 +1,15 @@
 import {Context, inject} from '@loopback/core';
-
 import {
+  RestBindings,
+  SequenceHandler,
   FindRoute,
-  InvokeMethod,
   ParsedRequest,
   ParseParams,
-  Reject,
+  InvokeMethod,
   Send,
   ServerResponse,
-  SequenceHandler,
-  RestBindings,
+  Reject,
 } from '@loopback/rest';
-
 import {AuthenticateFn, AuthenticationBindings} from '@loopback/authentication';
 
 const SequenceActions = RestBindings.SequenceActions;
@@ -32,6 +30,7 @@ export class MySequence implements SequenceHandler {
     try {
       const route = this.findRoute(req);
       await this.authenticateRequest(req); //authenticate
+      // console.log(res);
       const args = await this.parseParams(req, route);
       const result = await this.invoke(route, args);
       this.send(res, result);
