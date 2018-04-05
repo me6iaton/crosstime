@@ -1,7 +1,8 @@
 import {
   AuthenticationComponent,
   AuthenticationBindings,
-} from '@loopback/authentication';
+} from './packages/authentication';
+import {SessionComponent} from './packages/session';
 import {ApplicationConfig} from '@loopback/core';
 import {RestApplication, RestServer} from '@loopback/rest';
 import {MyAuthStrategyProvider} from './providers/auth-strategy';
@@ -16,6 +17,7 @@ export class CrosstimeApplication extends BootMixin(RestApplication) {
   constructor(options?: ApplicationConfig) {
     super(options);
 
+    this.component(SessionComponent);
     this.component(AuthenticationComponent);
     this.bind(AuthenticationBindings.STRATEGY).toProvider(
       MyAuthStrategyProvider,

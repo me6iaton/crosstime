@@ -45,13 +45,17 @@
     "@loopback/core": "^0.2.0",
     "@loopback/openapi-v3": "^0.3.0",
     "@loopback/rest": "^0.3.0",
+    "express-session": "^1.15.6",
     "passport": "^0.4.0",
     "passport-http": "^0.3.0",
-    "passport-strategy": "^1.0.0"
+    "passport-strategy": "^1.0.0",
+    "passport-vkontakte": "^0.3.2"
   },
   "devDependencies": {
     "@loopback/build": "^0.2.0",
     "@loopback/testlab": "^0.3.0",
+    "@types/express": "^4.11.1",
+    "@types/express-session": "^1.15.8",
     "@types/passport": "^0.4.3",
     "@types/passport-http": "^0.3.5",
     "forever-monitor": "^1.7.1",

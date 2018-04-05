@@ -11,12 +11,16 @@ export class WhoAmIController {
     @inject(AuthenticationBindings.CURRENT_USER) private user: UserProfile,
   ) {}
 
-  @authenticate('BasicStrategy')
+  // @authenticate('BasicStrategy')
+  @authenticate('VkontakteStrategy')
   @get('/whoAmI')
-  whoAmI() {
-    return {
-      id: this.user.id,
-      name: this.user.name,
-    };
+  whoAmI(): UserProfile {
+    return {id: this.user.id, name: this.user.name};
+  }
+
+  @authenticate('VkontakteStrategy')
+  @get('/verify')
+  verify(): UserProfile {
+    return {id: this.user.id, name: this.user.name};
   }
 }
