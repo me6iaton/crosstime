@@ -3,7 +3,7 @@ import {
   AuthenticationBindings,
 } from './packages/authentication';
 import {SessionComponent} from './packages/session';
-import {ApplicationConfig} from '@loopback/core';
+import {ApplicationConfig} from './config.type';
 import {RestApplication, RestServer} from '@loopback/rest';
 import {MyAuthStrategyProvider} from './providers/auth-strategy';
 import {MySequence} from './sequence';

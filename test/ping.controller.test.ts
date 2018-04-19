@@ -30,8 +30,9 @@ describe('PingController', () => {
 
   function givenAnApplication() {
     app = new CrosstimeApplication({
-      rest: {
-        port: 0,
+      rest: {port: 0},
+      session: {
+        secret: 'test',
       },
     });
   }

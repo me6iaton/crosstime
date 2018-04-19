@@ -1,5 +1,6 @@
 import {CrosstimeApplication} from './application';
-import {ApplicationConfig} from '@loopback/core';
+import {ApplicationConfig} from './config.type';
+import {RestBindings} from '@loopback/rest';
 
 export {CrosstimeApplication};
 
