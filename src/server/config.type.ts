@@ -7,6 +7,17 @@ import {SessionConfig} from './packages/session';
 export interface ApplicationConfig {
   rest?: RestServerConfig;
   session: SessionConfig;
+  auth: {
+    vkontakte: {
+      clientID: string;
+      clientSecret: string;
+      callbackURL: string;
+      profileFields?: [string];
+      apiVersion?: string;
+      lang?: string;
+      photoSize?: number;
+    };
+  };
   /**
    * Other properties
    */

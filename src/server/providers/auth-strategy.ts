@@ -4,8 +4,10 @@ import {
   AuthenticationMetadata,
   UserProfile,
 } from '@loopback/authentication';
+import {CoreBindings} from '@loopback/core';
 import {Strategy} from 'passport';
 import {BasicStrategy} from 'passport-http';
+import {ApplicationConfig} from '../config.type';
 // @ts-ignore
 import {Strategy as VKontakteStrategy} from 'passport-vkontakte';
 
@@ -13,6 +15,8 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
   constructor(
     @inject(AuthenticationBindings.METADATA)
     private metadata: AuthenticationMetadata,
+    @inject(CoreBindings.APPLICATION_CONFIG)
+    private readonly config: ApplicationConfig,
   ) {}
 
   value(): ValueOrPromise<Strategy | undefined> {
@@ -25,14 +29,7 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
     if (name === 'BasicStrategy') {
       return new BasicStrategy(this.verifyOld);
     } else if (name === 'VkontakteStrategy') {
-      return new VKontakteStrategy(
-        {
-          clientID: '6434029',
-          clientSecret: 'qeM8oImG1CgRkOWtrjxw',
-          callbackURL: 'http://localhost:3000/verify',
-        },
-        this.verify,
-      );
+      return new VKontakteStrategy(this.config.auth.vkontakte, this.verify);
     } else {
       return Promise.reject(`The strategy ${name} is not available.`);
     }
@@ -58,6 +55,22 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
     }
   }
 
+  verify(
+    accessToken: string,
+    refreshToken: string,
+    params: ApplicationConfig['auth']['vkontakte'],
+    // @ts-ignore
+    profile,
+    done: (err: Error | null, user?: UserProfile) => void,
+  ) {
+    // @ts-ignore // @ts-ignore
+    done(null, profile);
+    //   User.findOrCreate({ vkontakteId: profile.id })
+    //       .then(function (user) { done(null, user); })
+    //       .catch(done);
+    // }
+  }
+
   // function myVerifyCallbackFn(accessToken, refreshToken, params, profile, done) {
 
   //   // Now that we have user's `profile` as seen by VK, we can
@@ -69,20 +82,4 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
   //       .then(function (user) { done(null, user); })
   //       .catch(done);
   // }
-
-  verify(
-    accessToken: string,
-    refreshToken: string,
-    // @ts-ignore
-    params,
-    // @ts-ignore
-    profile,
-    done: (err: Error | null, user?: UserProfile) => void,
-  ) {
-    done(null, profile);
-    //   User.findOrCreate({ vkontakteId: profile.id })
-    //       .then(function (user) { done(null, user); })
-    //       .catch(done);
-    // }
-  }
 }

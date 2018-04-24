@@ -34,6 +34,13 @@ describe('PingController', () => {
       session: {
         secret: 'test',
       },
+      auth: {
+        vkontakte: {
+          clientID: '6434029',
+          clientSecret: 'qeM8oImG1CgRkOWtrjxw',
+          callbackURL: 'http://localhost:3000/verify',
+        },
+      },
     });
   }
 
