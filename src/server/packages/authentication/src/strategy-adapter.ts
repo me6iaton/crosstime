@@ -5,32 +5,31 @@
 
 import {HttpErrors, ParsedRequest, ServerResponse} from '@loopback/rest';
 import {Strategy} from 'passport';
-import {UserProfile} from './providers/authenticate';
+import {UserProfile} from './providers/authentication.provider';
 
 const PassportRequestExtras: Express.Request = require('passport/lib/http/request');
 
 /**
  * Shimmed Request to satisfy express requirements of passport strategies.
  */
-// tslint:disable:no-any
 export class ShimRequest implements Express.Request {
   headers: Object;
   query: Object;
   url: string;
   path: string;
   method: string;
-  session?: any;
+  session?: Express.Session;
 
-  constructor(request: ParsedRequest) {
+  constructor(request: ParsedRequest, session?: Express.Session) {
     this.headers = request.headers;
     this.query = request.query;
     this.url = request.url;
     this.path = request.path;
     this.method = request.method;
-    // @ts-ignore
-    this.session = request.session;
+    this.session = session;
   }
 
+  // tslint:disable:no-any
   login(user: any, done: (err: any) => void): void;
   login(user: any, options: any, done: (err: any) => void): void;
   login(user: any, options: any, done?: any) {
@@ -82,8 +81,12 @@ export class StrategyAdapter {
    *     3. authenticate using the strategy
    * @param req {http.ServerRequest} The incoming request.
    */
-  authenticate(req: ParsedRequest, res: ServerResponse) {
-    const shimReq = new ShimRequest(req);
+  authenticate(
+    req: ParsedRequest,
+    res: ServerResponse,
+    session?: Express.Session,
+  ) {
+    const shimReq = new ShimRequest(req, session);
     return new Promise<UserProfile>((resolve, reject) => {
       // create a prototype chain of an instance of a passport strategy
       const strategy = Object.create(this.strategy);

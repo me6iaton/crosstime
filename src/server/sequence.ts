@@ -1,22 +1,23 @@
 import {Context, inject} from '@loopback/core';
 import {
-  RestBindings,
-  SequenceHandler,
   FindRoute,
-  ParsedRequest,
-  ParseParams,
   InvokeMethod,
-  Send,
-  ServerResponse,
+  ParseParams,
+  ParsedRequest,
   Reject,
+  RestBindings,
+  Send,
+  SequenceHandler,
+  ServerResponse,
 } from '@loopback/rest';
 import {
   AuthenticateFn,
   AuthenticationBindings,
 } from './packages/authentication';
-import {AddSessionFn, SessionBindings} from './packages/session';
+import {AddSessionFn, SessionBindings, SaveSessionFn} from './packages/session';
 
 const SequenceActions = RestBindings.SequenceActions;
+const SessionActions = SessionBindings.SessionActions;
 
 export class MySequence implements SequenceHandler {
   constructor(
@@ -27,30 +28,19 @@ export class MySequence implements SequenceHandler {
     @inject(SequenceActions.SEND) public send: Send,
     @inject(SequenceActions.REJECT) public reject: Reject,
     @inject(AuthenticationBindings.AUTH_ACTION) protected auth: AuthenticateFn,
-    @inject(SessionBindings.SESSION_ACTION) protected addSession: AddSessionFn,
+    @inject(SessionActions.ADD) protected addSession: AddSessionFn,
+    @inject(SessionActions.SAVE) protected saveSession: SaveSessionFn,
   ) {}
 
   async handle(req: ParsedRequest, res: ServerResponse) {
     try {
-      // type reqWithSession = ParsedRequest & {session?: string};
-      // interface reqWithSession extends ParsedRequest {
-      //   session?: string;
-      // }
-
-      // let clone = {...req} as reqWithSession;
-      // Object.setPrototypeOf(clone, Object.getPrototypeOf(req));
-      // clone.session = 'test';
-
-      // let clone: reqWithSession = Object.create(req);
-      // clone.session = 'test';
-
       const route = this.findRoute(req);
-      const [sReq, sRes] = await this.addSession(req, res);
-
-      await this.auth(sReq, sRes); // check authenticate
-      const args = await this.parseParams(sReq, route);
+      const session = await this.addSession(req, res); // add session
+      const user = await this.auth(req, res, session); // check authenticate
+      const args = await this.parseParams(req, route);
       const result = await this.invoke(route, args);
-      this.send(sRes, result);
+      await this.saveSession(); // save session
+      this.send(res, result);
     } catch (err) {
       this.reject(res, req, err);
     }

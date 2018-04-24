@@ -21,9 +21,11 @@ export type PassportRequest = ParsedRequest & Express.Request;
  * and returns an authenticated user
  */
 export interface AuthenticateFn {
-  (request: ParsedRequest, response: ServerResponse): Promise<
-    UserProfile | undefined
-  >;
+  (
+    request: ParsedRequest,
+    response: ServerResponse,
+    session?: Express.Session,
+  ): Promise<UserProfile | undefined>;
 }
 
 /**
@@ -39,9 +41,9 @@ export interface UserProfile {
 /**
  * @description Provider of a function which authenticates
  * @example `context.bind('authentication_key')
- *   .toProvider(AuthenticationProvider)`
+ *   .toProvider(AuthenticateActionProvider)`
  */
-export class AuthenticationProvider implements Provider<AuthenticateFn> {
+export class AuthenticateActionProvider implements Provider<AuthenticateFn> {
   constructor(
     // The provider is instantiated for Sequence constructor,
     // at which time we don't have information about the current
@@ -60,40 +62,28 @@ export class AuthenticationProvider implements Provider<AuthenticateFn> {
    * @returns authenticateFn
    */
   value(): AuthenticateFn {
-    return async (request: ParsedRequest, response: ServerResponse) => {
-      return await authenticateRequest(
-        this.getStrategy,
-        request,
-        response,
-        this.setCurrentUser,
-      );
-    };
+    return (req, res, ses) => this.action(req, res, ses);
   }
-}
 
-/**
- * The implementation of authenticate() sequence action.
- * @param strategy Passport strategy
- * @param request Parsed Request
- * @param setCurrentUser The setter function to update the current user
- *   in the per-request Context
- */
-async function authenticateRequest(
-  getStrategy: Getter<Strategy>,
-  request: ParsedRequest,
-  response: ServerResponse,
-  setCurrentUser: Setter<UserProfile>,
-): Promise<UserProfile | undefined> {
-  const strategy = await getStrategy();
-  if (!strategy) {
-    // The invoked operation does not require authentication.
-    return undefined;
+  /**
+   * The implementation of authenticate() sequence action.
+   */
+  async action(
+    request: ParsedRequest,
+    response: ServerResponse,
+    session?: Express.Session,
+  ): Promise<UserProfile | undefined> {
+    const strategy = await this.getStrategy();
+    if (!strategy) {
+      // The invoked operation does not require authentication.
+      return undefined;
+    }
+    if (!strategy.authenticate) {
+      throw new Error('invalid strategy parameter');
+    }
+    const strategyAdapter = new StrategyAdapter(strategy);
+    const user = await strategyAdapter.authenticate(request, response, session);
+    this.setCurrentUser(user);
+    return user;
   }
-  if (!strategy.authenticate) {
-    return Promise.reject(new Error('invalid strategy parameter'));
-  }
-  const strategyAdapter = new StrategyAdapter(strategy);
-  const user = await strategyAdapter.authenticate(request, response);
-  setCurrentUser(user);
-  return user;
 }
